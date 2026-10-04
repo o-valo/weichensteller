@@ -2,7 +2,7 @@
   <img src="weichensteller.jpg" alt="Weichensteller banner: inside a data centre a railway track runs between server racks while a robot throws a set of points." width="100%">
 </p>
 
-# 🚉 Weichensteller (Ollama + LLM-Bahnhof)
+# 🚉 Weichensteller (Ollama + LLM station)
 
 English | **[Deutsch](README.ger.md)**
 

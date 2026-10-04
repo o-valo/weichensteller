@@ -1,0 +1,20 @@
+# Python / virtuelle Umgebung
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Eigene Konfiguration mit Schluesseln. Die Vorlage .env.example ist
+# ausgenommen - sie wird bewusst mit veroeffentlicht.
+.env
+.env.*
+!.env.example
+
+# Laufzeit: Log und Zustandsordner (Sticky-Fallback merkt sich dort ein Gleis)
+weichensteller.log
+*.log
+state/
+
+# Reste aus dem Testbetrieb
+tests/tmp-*/
+.DS_Store

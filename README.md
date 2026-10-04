@@ -226,25 +226,6 @@ embeddings and the NDJSON stream (19 checks):
 - `pull`/`push` neither download nor upload anything – they only manage the
   program's own catalogue.
 
-## Provenance
-
-The base is `~/ollama-bahnhof/ollama_bahnhof.py` (version 1.2.0) – the Ollama
-surface was **not** touched. Only these things were added: two track sources in
-a fixed order, sticky fallback, the new switches and the extended diagnostics.
-The code therefore **diverges on purpose**: improvements to the Ollama surface
-belong in `~/ollama-bahnhof` and have to be pulled in here.
-
-To keep that traceable, the difference ships as a **patch** (`patch/`):
-`patch-weichensteller.py` and `patch-weichensteller-2.py` turn a fresh copy of
-`ollama_bahnhof.py` into this Weichensteller, `patch-weichensteller-3.py`
-secures the **Responses API** (`/v1/responses`) – it has been in the copy since
-Ollama-Bahnhof 1.2.0 anyway, the script only inserts it if the copy is older –
-and `setup-weichensteller.py` adds the `~` path and the `.env.example`.
-To pull changes in: copy the new Ollama-Bahnhof to `weichensteller.py` and the
-test file to `tests/test_weichensteller.py` (there it does
-`import weichensteller as wst`), then run the **four** scripts in order. If an
-anchor no longer matches, the script reports it and changes **nothing**.
-
 ## License
 
 **GNU Affero General Public License v3.0 or later** – the full text is in
@@ -262,11 +243,10 @@ tell whether a real Ollama server is answering or this proxy. That is why the
 endpoints are called `/api/chat`, `/api/tags`, `/api/ps` and so on, and why
 `/v1/models` reports `owned_by: weichensteller`.
 
-Until the rename (04.10.2026) the pseudo-model was still called
-`ollama-bahnhof:latest`. The name has been carried along at every
-client-facing place – `VIRTUAL_MODEL` in the catalogue, `/api/show`,
-`/api/ps`. **The name of the base module `Ollama-Bahnhof` nevertheless
-remains**, because it is a separate program of its own: this one grew out of it
-(see [Provenance](#provenance)). The same applies to the `LLM-Bahnhof`, whose
-track list is only read here – which is why the field in `/health` is still
-called `llm_bahnhof_konfiguration`.
+
+---
+
+**Powered by AI** – developed with the support of AI-assisted tools for the code
+changes and the documentation. The code, the tests and the architectural
+decisions come from a human person who is responsible for them; the project is
+likewise responsible for any remaining errors.

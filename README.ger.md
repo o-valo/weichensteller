@@ -229,27 +229,6 @@ Sticky-Verhalten, `/v1/completions`, Einbettungen und den NDJSON-Strom
   trägt ein Gleis mit `/embeddings` ein (z. B. ein echtes Ollama).
 - `pull`/`push` laden und senden nichts – sie verwalten nur den eigenen Katalog.
 
-## Herkunft
-
-Basis ist `~/ollama-bahnhof/ollama_bahnhof.py` (Fassung 1.2.0) – die
-Ollama-Oberfläche wurde **nicht** angetastet. Ergänzt wurden nur:
-zwei Gleis-Quellen mit fester Reihenfolge, Sticky-Fallback, die neuen Schalter
-und die erweiterte Diagnose. Der Code läuft damit bewusst **auseinander**:
-Verbesserungen an der Ollama-Oberfläche gehören in `~/ollama-bahnhof` und
-müssen hier nachgezogen werden.
-
-Damit das nachvollziehbar bleibt, liegt der Unterschied als **Patch** bei
-(`patch/`): `patch-weichensteller.py` und `patch-weichensteller-2.py` machen
-aus einer frischen Kopie von `ollama_bahnhof.py` diesen Weichensteller,
-`patch-weichensteller-3.py` sichert die **Responses-API** (`/v1/responses`) –
-seit Ollama-Bahnhof 1.2.0 liegt sie ohnehin in der Kopie, das Skript setzt sie
-nur ein, falls die Kopie älter ist, `setup-weichensteller.py` ergänzt den
-`~`-Pfad und die `.env.example`.
-Zum Nachziehen: Kopie des neuen Ollama-Bahnhofs nach `weichensteller.py` und der
-Testdatei nach `tests/test_weichensteller.py` (dort `import weichensteller as
-wst`), dann die **vier** Skripte der Reihe nach laufen lassen. Passt eine
-Ankerstelle nicht mehr, meldet das Skript es und ändert **nichts**.
-
 ## Lizenz
 
 **GNU Affero General Public License v3.0 oder später** – der vollständige
@@ -267,11 +246,10 @@ unterscheiden können, ob ein echter Ollama-Server antwortet oder dieser
 Proxy. Deshalb heißen die Endpunkte `/api/chat`, `/api/tags`, `/api/ps` und
 so weiter, und `/v1/models` meldet `owned_by: weichensteller`.
 
-Bis zur Umbenennung (04.10.2026) hieß das Pseudo-Modell noch
-`ollama-bahnhof:latest`. Die Bezeichnung ist an allen clientseitigen Stellen
-– `VIRTUAL_MODEL` im Katalog, `/api/show`, `/api/ps` – mitgezogen worden.
-**Der Name des Basismoduls `Ollama-Bahnhof` bleibt aber bestehen**, weil er
-ein eigenes, anderes Programm ist: aus ihm ist dieses hier hervorgegangen
-(siehe [Herkunft](#herkunft)). Dasselbe gilt für den `LLM-Bahnhof`, dessen
-Gleisliste hier nur gelesen wird – deshalb heißt das Feld
-`llm_bahnhof_konfiguration` in `/health` weiterhin so.
+
+---
+
+**Powered by AI** – entwickelt mit Unterstützung KI-gestützter Werkzeuge für die
+Codeänderungen und die Dokumentation. Der Code, die Tests und die
+Architekturentscheidungen stammen von einer menschlich verantwortlichen Person;
+für verbleibende Fehler ist entsprechend das Projekt verantwortlich.

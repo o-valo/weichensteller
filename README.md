@@ -2,14 +2,15 @@
   <img src="weichensteller.jpg" alt="Weichensteller banner: inside a data centre a railway track runs between server racks while a robot throws a set of points." width="100%">
 </p>
 
-# 🚉 Weichensteller (Ollama + LLM station)
+# 🚉 Weichensteller – switchman (Ollama + LLM-Bahnhof)
 
 English | **[Deutsch](README.ger.md)**
 
-**One program, two stations.** Outward, this Weichensteller **simulates a
-complete Ollama API** – every tool that "can do Ollama" talks to it and cannot
-tell the difference. But it does **not** forward those requests to a real
-Ollama: it forwards them to **any endpoint** it calls a *track*. That can be a
+**One program, two stations.** *Weichensteller* is German for a **switchman** –
+the one who throws the points and sets the course. Outward, this Weichensteller
+**simulates a complete Ollama API** – every tool that "can do Ollama" talks to
+it and cannot tell the difference. But it does **not** forward those requests to a
+real Ollama: it forwards them to **any endpoint** it calls a *track*. That can be a
 **real Ollama endpoint**, an **OpenAI-compatible** endpoint, a free-tier
 provider, or an entire router. If one fails, it moves on to the next.
 

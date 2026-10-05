@@ -21,18 +21,18 @@ dessen Gleisliste samt Sticky-Fallback, ohne dass man etwas umstellen muss.
 Er entstand, weil der LLM-Bahnhof nur `/v1/models`, `/v1/chat/completions`
 (+ `/api/v1/…`-Alias) und `/health` kennt: **kein `/v1/completions`, keine
 Einbettungen, keine Ollama-API**. Der Weichensteller vereint beides in einem
-Prozess – die Ollama-Oberfläche des Ollama-Bahnhofs (unverändert) und die
-Routing-Eigenschaften des LLM-Bahnhofs.
+Prozess – eine vollständige Ollama-Oberfläche und die Routing-Eigenschaften
+des LLM-Bahnhofs.
 
-| | Ollama-Bahnhof | LLM-Bahnhof | **Weichensteller** |
-|---|---|---|---|
-| Ausgabe nach außen | komplettes Ollama | OpenAI (`/v1`) | **komplettes Ollama** |
-| `/v1/completions` | ✅ | ❌ | **✅** |
-| Responses-API (`/v1/responses`) | ❌ | ❌ | **✅** |
-| Einbettungen (`/api/embed`, `/v1/embeddings`) | ✅ | ❌ | **✅** |
-| Gleisliste des LLM-Bahnhofs | – | ✅ | **✅ (gelesen)** |
-| Sticky-Fallback | – | ✅ | **✅** |
-| Simulation ohne Gleis | ✅ | – | **✅** |
+| | LLM-Bahnhof | **Weichensteller** |
+|---|---|---|
+| Ausgabe nach außen | OpenAI (`/v1`) | **komplettes Ollama** |
+| `/v1/completions` | ❌ | **✅** |
+| Responses-API (`/v1/responses`) | ❌ | **✅** |
+| Einbettungen (`/api/embed`, `/v1/embeddings`) | ❌ | **✅** |
+| Gleisliste des LLM-Bahnhofs | ✅ | **✅ (gelesen)** |
+| Sticky-Fallback | ✅ | **✅** |
+| Simulation ohne Gleis | – | **✅** |
 
 ## Was ist ein Gleis?
 
@@ -105,16 +105,15 @@ aus `ROUTE_01` der fremden Datei wird `llm-ROUTE_01`, die eigenen bleiben
 beginnt die **nächste** Anfrage dort und läuft im Kreis weiter
 (`ROUTE_02 → ROUTE_03 → … → ROUTE_01`). So springt der Weichensteller nicht bei jeder
 Anfrage wieder auf ein Gleis zurück, das eben noch ausgefallen war. Mit
-`STICKY_FALLBACK=0` beginnt jede Anfrage wieder beim ersten Gleis – das
-Verhalten des Ollama-Bahnhofs.
+`STICKY_FALLBACK=0` beginnt jede Anfrage wieder beim ersten Gleis.
 
 Der Ausfall eines Gleises **mitten im Strom** kann nicht mehr abgefangen werden
 (der Client hat schon Daten bekommen); dann bricht der Strom mit einer
-Fehlerzeile ab – wie beim Ollama-Bahnhof.
+Fehlerzeile ab.
 
 ## Nach außen: 100 % Ollama
 
-Die gesamte Oberfläche des Ollama-Bahnhofs ist unverändert übernommen:
+Die gesamte Ollama-Oberfläche ist unverändert übernommen:
 
 | Ollama nativ | | OpenAI-kompatibel |
 |---|---|---|
@@ -154,18 +153,9 @@ cp .env.example .env        # einmalig; Vorgaben reichen zum Loslegen
 ohne Umstellung an die Stelle eines echten Ollama; ein Client, der auf
 `http://127.0.0.1:11434` zeigt, merkt den Unterschied nicht.
 
-> Nur **einer** darf auf 11434 lauschen. Der Ollama-Bahnhof wurde dafür am
-> 21.09.2026 gestoppt (`kill -TERM <PID>`); er lauscht sonst auf denselben Port.
-> Umgekehrt: soll der Ollama-Bahnhof wieder laufen, hier in der `.env` auf
-> 11435 zurückstellen.
-
 ## Client anbinden
 
 ```bash
-export OLLAMA_HOST=http://127.0.0.1:11434
-ollama list
-ollama run weichensteller "Hallo"
-
 # OpenAI-kompatible Basis-URL
 http://127.0.0.1:11434/v1        # Schlüssel egal
 ```
@@ -183,7 +173,7 @@ vom Weichensteller zu Recht ein 404. Also `http://10.7.0.116:11434` eintragen, n
 curl -s http://127.0.0.1:11434/health | python3 -m json.tool
 ```
 
-Zeigt zusätzlich zum Ollama-Bahnhof: `gleis_reihenfolge`, `sticky_fallback`,
+Zeigt zusätzlich: `gleis_reihenfolge`, `sticky_fallback`,
 `sticky_gleis` (wo die nächste Anfrage beginnt), `llm_bahnhof_konfiguration`
 und `gleis_start` (die tatsächliche Reihenfolge dieser Anfrage). Jedes Gleis
 trägt seine Herkunft als `gruppe` (`llm` oder `eigene`).
@@ -194,7 +184,7 @@ trägt seine Herkunft als `gruppe` (`llm` oder `eigene`).
 ./venv/bin/python3 -m unittest discover -s tests -v
 ```
 
-- `tests/test_weichensteller.py` – die 54 Prüfungen des Ollama-Bahnhofs
+- `tests/test_weichensteller.py` – 54 Prüfungen
   (Oberfläche, Simulation, Gleis-Durchreichen gegen einen Stub-Server)
 - `tests/test_verbindung.py` – das Neue: zwei Gleis-Quellen in fester
   Reihenfolge, fehlende LLM-Bahnhof-Datei, Namensraum-Trennung, Zeitangabe im
@@ -235,9 +225,8 @@ Sticky-Verhalten, `/v1/completions`, Einbettungen und den NDJSON-Strom
 Text steht in [`LICENSE`](LICENSE).
 
 AGPL-3.0 ist hier nicht zufällig gewählt: das Programm ist ein abgeleitetes
-Werk. Es geht auf den `llm-bahnhof` zurück, der seinerseits aus dem
-`ollama-bahnhof` hervorging. Wer eine ältere Fassung kopiert und verändert,
-muss diese Änderungen unter derselben Lizenz weitergeben – und wer den
+Werk. Es geht auf den `llm-bahnhof` zurück. Wer eine ältere Fassung kopiert und
+verändert, muss diese Änderungen unter derselben Lizenz weitergeben – und wer den
 Weichensteller als Netzwerkdienst nutzt, muss den Quelltext anbieten (Abschnitt 13).
 
 Zwei Namen, die nicht dasselbe sind: Das Programm heißt **Weichensteller**,

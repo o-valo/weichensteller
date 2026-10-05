@@ -21,18 +21,18 @@ reconfigure.
 It came about because the LLM-Bahnhof only knows `/v1/models`,
 `/v1/chat/completions` (plus an `/api/v1/…` alias) and `/health`: **no
 `/v1/completions`, no embeddings, no Ollama API**. The Weichensteller combines
-both in a single process – the Ollama surface of the Ollama-Bahnhof (unchanged)
-and the routing behaviour of the LLM-Bahnhof.
+both in a single process – a complete Ollama surface and the routing behaviour
+of the LLM-Bahnhof.
 
-| | Ollama-Bahnhof | LLM-Bahnhof | **Weichensteller** |
-|---|---|---|---|
-| What clients see | complete Ollama | OpenAI (`/v1`) | **complete Ollama** |
-| `/v1/completions` | ✅ | ❌ | **✅** |
-| Responses API (`/v1/responses`) | ❌ | ❌ | **✅** |
-| Embeddings (`/api/embed`, `/v1/embeddings`) | ✅ | ❌ | **✅** |
-| Reads the LLM-Bahnhof's track list | – | ✅ | **✅ (read-only)** |
-| Sticky fallback | – | ✅ | **✅** |
-| Simulation without any track | ✅ | – | **✅** |
+| | LLM-Bahnhof | **Weichensteller** |
+|---|---|---|
+| What clients see | OpenAI (`/v1`) | **complete Ollama** |
+| `/v1/completions` | ❌ | **✅** |
+| Responses API (`/v1/responses`) | ❌ | **✅** |
+| Embeddings (`/api/embed`, `/v1/embeddings`) | ❌ | **✅** |
+| Reads the LLM-Bahnhof's track list | ✅ | **✅ (read-only)** |
+| Sticky fallback | ✅ | **✅** |
+| Simulation without any track | – | **✅** |
 
 ## What is a track?
 
@@ -103,16 +103,14 @@ the foreign file becomes `llm-ROUTE_01`, your own stay `ROUTE_01`.
 the **next** request starts there and continues round the circle
 (`ROUTE_02 → ROUTE_03 → … → ROUTE_01`). That way the Weichensteller does not
 hop back to a track that just failed on every single request. With
-`STICKY_FALLBACK=0` every request starts at the first track again – the
-behaviour of the Ollama-Bahnhof.
+`STICKY_FALLBACK=0` every request starts at the first track again.
 
 A track failing **mid-stream** can no longer be caught (the client has already
-received data); the stream then aborts with an error line – as with the
-Ollama-Bahnhof.
+received data); the stream then aborts with an error line.
 
 ## Outward: 100 % Ollama
 
-The entire surface of the Ollama-Bahnhof is carried over unchanged:
+The entire Ollama surface is carried over unchanged:
 
 | Ollama native | | OpenAI-compatible |
 |---|---|---|
@@ -152,18 +150,9 @@ cp .env.example .env        # once; the defaults are enough to get going
 therefore takes the place of a real Ollama without any reconfiguration; a
 client pointing at `http://127.0.0.1:11434` cannot tell the difference.
 
-> Only **one** process may listen on 11434. The Ollama-Bahnhof was stopped for
-> that reason on 21.09.2026 (`kill -TERM <PID>`); otherwise it listens on the
-> same port. The other way round: if the Ollama-Bahnhof should run again, set
-> the port back to 11435 in this `.env`.
-
 ## Connecting a client
 
 ```bash
-export OLLAMA_HOST=http://127.0.0.1:11434
-ollama list
-ollama run weichensteller "Hello"
-
 # OpenAI-compatible base URL
 http://127.0.0.1:11434/v1        # any API key will do
 ```
@@ -181,7 +170,7 @@ the configuration. If that already reads `…/v1`, the client asks for
 curl -s http://127.0.0.1:11434/health | python3 -m json.tool
 ```
 
-Beyond what the Ollama-Bahnhof reports, this shows `gleis_reihenfolge`,
+Beyond the basic diagnostics, this shows `gleis_reihenfolge`,
 `sticky_fallback`, `sticky_gleis` (where the next request starts),
 `llm_bahnhof_konfiguration` and `gleis_start` (the actual order for this
 request). Every track carries its origin as `gruppe` (`llm` or `eigene`).
@@ -192,7 +181,7 @@ request). Every track carries its origin as `gruppe` (`llm` or `eigene`).
 ./venv/bin/python3 -m unittest discover -s tests -v
 ```
 
-- `tests/test_weichensteller.py` – the 54 checks of the Ollama-Bahnhof
+- `tests/test_weichensteller.py` – 54 checks
   (surface, simulation, passing requests through to a stub server)
 - `tests/test_verbindung.py` – the new part: two track sources in fixed order,
   a missing LLM-Bahnhof file, namespace separation, a duration in the model
@@ -233,9 +222,8 @@ embeddings and the NDJSON stream (19 checks):
 [`LICENSE`](LICENSE).
 
 AGPL-3.0 was not chosen by accident here: the program is a derived work. It
-goes back to the `llm-bahnhof`, which in turn emerged from the
-`ollama-bahnhof`. Anyone who copies and modifies an older version must pass
-those modifications on under the same license – and anyone who runs the
+goes back to the `llm-bahnhof`. Anyone who copies and modifies an older version
+must pass those modifications on under the same license – and anyone who runs the
 Weichensteller as a network service must offer the source code (section 13).
 
 Two names that are not the same thing: the program is called **Weichensteller**,
